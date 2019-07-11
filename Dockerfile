@@ -7,10 +7,10 @@ LABEL base_image="nfcore/base"
 LABEL version="1.0"
 LABEL software="svaba-nf"
 LABEL software.version="1.0"
-LABEL about.summary="Container image containing all requirements for svaba-nf"
-LABEL about.home="http://github.com/IARCbioinfo/svaba-nf"
-LABEL about.documentation="http://github.com/IARCbioinfo/svaba-nf/README.md"
-LABEL about.license_file="http://github.com/IARCbioinfo/svaba-nf/LICENSE.txt"
+LABEL about.summary="Container image containing all requirements for ITH_pipeline"
+LABEL about.home="http://github.com/delhommet/ITH_pipeline"
+LABEL about.documentation="http://github.com/delhommet/ITH_pipeline/README.md"
+LABEL about.license_file="http://github.com/delhommet/ITH_pipeline/LICENSE.txt"
 LABEL about.license="GNU-3.0"
 
 ################## MAINTAINER ######################
@@ -30,4 +30,4 @@ RUN pip install numpy && pip install matplotlib
 
 # installation of eigen
 RUN wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
-RUN tar -vxjf 3.3.7.tar.bz2 && cd eigen*
+RUN tar -vxjf 3.3.7.tar.bz2 && cd eigen* # here install cmake if not available
