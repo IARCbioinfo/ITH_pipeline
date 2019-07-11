@@ -37,3 +37,6 @@ RUN export BNPYROOT=~/bnpy-dev
 RUN export EIGENPATH=~/eigen-eigen-323c052e1731
 RUN export PYTHONPATH=${PYTHONPATH}:~/bnpy-dev
 RUN export BNPYOUTDIR=~/nbpy-dev-results
+
+# building the C++ library called libfwdbwd to speed HMM inference
+RUN cd $BNPYROOT && export EIGENPATH=/path/to/eigen3/ && make libfwdbwd
