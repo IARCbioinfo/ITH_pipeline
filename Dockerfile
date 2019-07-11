@@ -29,5 +29,11 @@ RUN cd ~ && git clone https://michaelchughes@bitbucket.org/michaelchughes/bnpy-d
 RUN pip install numpy && pip install matplotlib
 
 # installation of eigen
-RUN wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
+RUN cd ~ && wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
 RUN tar -vxjf 3.3.7.tar.bz2 && cd eigen* # here install cmake if not available
+
+# environment variable to use correctly bnpy
+RUN export BNPYROOT=~/bnpy-dev
+RUN export EIGENPATH=~/eigen-eigen-323c052e1731
+RUN export PYTHONPATH=${PYTHONPATH}:~/bnpy-dev
+RUN export BNPYOUTDIR=~/nbpy-dev-results
