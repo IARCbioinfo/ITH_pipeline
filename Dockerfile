@@ -21,22 +21,13 @@ RUN conda install -c bioconda bcftools=1.7
 RUN conda install -c bioconda samtools=1.7
 
 # installation of python libraries
-pip install multiprocess
-pip install subprocess
+RUN pip install multiprocess && pip install subprocess && pip install pandas && pip install seaborn
 
 # installation of bnpy
 RUN cd ~ && git clone https://michaelchughes@bitbucket.org/michaelchughes/bnpy-dev/ && export BNPYROOT=~/bnpy-dev
 RUN pip install numpy && pip install matplotlib
 
-# installation of eigen
-RUN cd ~ && wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
-RUN tar -vxjf 3.3.7.tar.bz2 && cd eigen* # here install cmake if not available
-
 # environment variable to use correctly bnpy
 RUN export BNPYROOT=~/bnpy-dev
-RUN export EIGENPATH=~/eigen-eigen-323c052e1731
 RUN export PYTHONPATH=${PYTHONPATH}:~/bnpy-dev
 RUN export BNPYOUTDIR=~/nbpy-dev-results
-
-# building the C++ library called libfwdbwd to speed HMM inference
-RUN cd $BNPYROOT && export EIGENPATH=/path/to/eigen3/ && make libfwdbwd
