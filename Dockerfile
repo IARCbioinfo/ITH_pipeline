@@ -28,6 +28,16 @@ RUN cd ~ && git clone https://michaelchughes@bitbucket.org/michaelchughes/bnpy-d
 RUN pip install numpy && pip install matplotlib
 
 # environment variable to use correctly bnpy
-RUN export BNPYROOT=~/bnpy-dev
-RUN export PYTHONPATH=${PYTHONPATH}:~/bnpy-dev
-RUN export BNPYOUTDIR=~/nbpy-dev-results
+ENV BNPYROOT=~/bnpy-dev
+ENV PYTHONPATH=${PYTHONPATH}:~/bnpy-dev
+ENV BNPYOUTDIR=~/nbpy-dev-results
+
+# install gurobi
+RUN cd ~ && wget https://packages.gurobi.com/8.1/gurobi8.1.1_linux64.tar.gz && tar -zxvf gurobi8.1.1_linux64.tar.gz
+ENV PATH=${PATH}:~/gurobi811/linux64/bin
+ENV GRB_LICENSE_FILE=~/gurobi811/gurobi.lic
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:~/gurobi811/linux64/lib"
+
+# install hatchet
+RUN cd ~ && git clone https://github.com/raphael-group/hatchet
+RUN cd hatchet/ && mkdir build && cd build/ && cmake .. && make
