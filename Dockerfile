@@ -18,6 +18,9 @@ MAINTAINER Tiffany Delhomme <delhommet@students.iarc.fr>
 
 ################## INSTALLATION ######################
 
+RUN apt-get update -y && \
+	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y build-essential # to have gcc compiler for seaborn
+
 ################## HATCHET ###########################
 RUN conda install -c bioconda bcftools=1.7
 RUN conda install -c bioconda samtools=1.7
