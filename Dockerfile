@@ -21,8 +21,8 @@ MAINTAINER Tiffany Delhomme <delhommet@students.iarc.fr>
 RUN apt-get update -y && \
 	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y build-essential # to have gcc compiler for seaborn
 
-RUN wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz && tar xf cmake-3.2.2.tar.gz && cd cmake-3.2.2 && ./configure && make
-RUN ln -s ~/cmake-3.2.2/bin/cmake /usr/bin
+RUN cd ~ && wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz && tar xf cmake-3.2.2.tar.gz && cd cmake-3.2.2 && ./configure && make
+RUN chmod +x ~/cmake-3.2.2/bin/cmake && ln -s ~/cmake-3.2.2/bin/cmake /usr/bin
 
 ################## HATCHET ###########################
 RUN conda install -c bioconda bcftools=1.7
@@ -41,13 +41,22 @@ ENV BNPYOUTDIR=~/nbpy-dev-results
 
 # install gurobi
 RUN cd ~ && wget https://packages.gurobi.com/8.1/gurobi8.1.1_linux64.tar.gz && tar -zxvf gurobi8.1.1_linux64.tar.gz
+RUN cd ~/gurobi811/linux64/src/build/ && make && cp libgurobi_c++.a ../../lib/
 ENV PATH=${PATH}:~/gurobi811/linux64/bin
 ENV GRB_LICENSE_FILE=~/gurobi811/gurobi.lic # here should be modified to get the license path in input
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:~/gurobi811/linux64/lib"
+ENV GUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so
 
 # install hatchet
+# here should 1. modify FindGUROBI.cmake to add gurobi path 2. modify CMakeLists.txt by adding -pthread
 RUN cd ~ && git clone https://github.com/raphael-group/hatchet
-RUN cd hatchet && mkdir build && cd build/ && cmake .. && make
+RUN cd hatchet && sed -i '5s/""/"~\/gurobi811\/"/g' FindGUROBI.cmake && sed -i '7s/-std=c++11/-std=c++11 -pthread/g' CMakeLists.txt
+RUN mkdir build && cd build/
+RUN cmake .. \
+        -DGUROBI_CPP_LIB=/root/gurobi811/linux64/lib/libgurobi_c++.a \
+        -DGUROBI_INCLUDE_DIR=/root/gurobi811/linux64/include/ \
+        -DGUROBI_LIB=/root/gurobi811/linux64/lib/libgurobi81.so
+RUN make
 
 ################# DECIFER ##########################
 # install boost library
