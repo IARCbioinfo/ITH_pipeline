@@ -30,6 +30,7 @@ RUN conda install -c bioconda samtools=1.7
 
 # installation of python libraries
 RUN pip install multiprocess && pip install pandas && pip install seaborn && pip install matplotlib
+RUN pip install matplotlib-venn #in order to run the BBeval script
 
 # installation of bnpy
 RUN cd ~ && git clone https://michaelchughes@bitbucket.org/michaelchughes/bnpy-dev/
