@@ -29,7 +29,7 @@ RUN conda install -c bioconda bcftools=1.7
 RUN conda install -c bioconda samtools=1.7
 
 # installation of python libraries
-RUN pip install multiprocess && pip install pandas && pip install seaborn
+RUN pip install multiprocess && pip install pandas && pip install seaborn && pip install matplotlib
 
 # installation of bnpy
 RUN cd ~ && git clone https://michaelchughes@bitbucket.org/michaelchughes/bnpy-dev/
