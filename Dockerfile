@@ -51,7 +51,7 @@ ENV GUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so
 # install hatchet
 # here should 1. modify FindGUROBI.cmake to add gurobi path 2. modify CMakeLists.txt by adding -pthread
 RUN cd ~ && git clone https://github.com/raphael-group/hatchet
-RUN cd hatchet && sed -i '5s/""/"~\/gurobi811\/"/g' FindGUROBI.cmake && sed -i '7s/-std=c++11/-std=c++11 -pthread/g' CMakeLists.txt
+RUN cd hatchet && sed -i '5s/""/"~\/gurobi811\/"/g' FindGUROBI.cmake && sed -i '7s/-std=c++11/-std=c++11 -pthread/g' CMakeLists.txt # second sed only in this dockerfile
 RUN mkdir build && cd build/
 RUN cmake .. \
         -DGUROBI_CPP_LIB=/root/gurobi811/linux64/lib/libgurobi_c++.a \
@@ -61,21 +61,21 @@ RUN make
 
 ################# DECIFER ##########################
 # install boost library
-RUN cd ~ && wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2
-RUN tar --bzip2 -xf boost_1_61_0.tar.bz2
-RUN ./bootstrap.sh --prefix=~/usr && ./b2
-ENV BOOST_ROOT=~/boost_1_61_0
+#RUN cd ~ && wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2
+#RUN tar --bzip2 -xf boost_1_61_0.tar.bz2
+#RUN ./bootstrap.sh --prefix=~/usr && ./b2
+#ENV BOOST_ROOT=~/boost_1_61_0
 
 # install lemon
-RUN cd ~ && wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
-RUN tar -zxvf lemon-1.3.1.tar.gz
-RUN cd lemon-1.3.1/ && mkdir build && cd build && cmake .. && make
+#RUN cd ~ && wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
+#RUN tar -zxvf lemon-1.3.1.tar.gz
+#RUN cd lemon-1.3.1/ && mkdir build && cd build && cmake .. && make
 
 #install decifer
-RUN cd ~ && git clone https://github.com/raphael-group/decifer && cd decifer
-RUN mkdir build && cd build
+#RUN cd ~ && git clone https://github.com/raphael-group/decifer && cd decifer
+#RUN mkdir build && cd build
 
-RUN cmake -DLIBLEMON_ROOT=~/lemon-1.3.1/lemon -DCPLEX=OFF \
--DGUROBI_INCLUDE_DIR=~/gurobi811/linux64/include \
--DGUROBI_CPP_LIB=~/gurobi811/linux64/lib/libgurobi_c++.a \
--DGUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so ..
+#RUN cmake -DLIBLEMON_ROOT=~/lemon-1.3.1/lemon -DCPLEX=OFF \
+#-DGUROBI_INCLUDE_DIR=~/gurobi811/linux64/include \
+#-DGUROBI_CPP_LIB=~/gurobi811/linux64/lib/libgurobi_c++.a \
+#-DGUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so ..
