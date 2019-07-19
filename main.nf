@@ -26,7 +26,7 @@ params.bnpy_folder = "/usr/bin/"
 params.hatchet_folder = "/usr/bin/"
 params.input_folder = null
 params.ref = null
-params.output_folder = "."
+params.output_folder = "results"
 
 log.info ""
 log.info "----------------------------------------------------------------"
