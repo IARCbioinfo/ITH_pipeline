@@ -1,20 +1,31 @@
 #!/bin/bash
 
-REF=$0
-SAM=$1
-BCF=$2
-BNPY=$3
+REF=$2
+SAM=$3
+BCF=$4
+BNPY=$5
 
-HATCHET_HOME=$4
+HATCHET_HOME=$6
 HATCHET="${HATCHET_HOME}/bin/HATCHet.py"
 UTILS="${HATCHET_HOME}/utils/"
 SOLVER="${HATCHET_HOME}/build/solve"
 
-XDIR="/data/gcs/mesomics/work/delhommet/HATCHet/B00JAKECD/"
-NORMAL="/data/gcs/mesomics/work/delhommet/HATCHet/B00JAKECD/B00JAKE_alt_HGV5FCCXY.DUAL171.3_BQSRecalibrated.bam"
-BAMS="/data/gcs/mesomics/work/delhommet/HATCHet/B00JAKECD/B00JAKC_alt_HGVWWCCXY.DUAL169.7-HGVWWCCXY.DUAL169.6_merged_BQSRecalibrated.bam /data/gcs/mesomics/work/delhommet/HATCHet/B00JAKECD/B00JAKD_alt_HGV5FCCXY.DUAL170.1-HGV5FCCXY.DUAL170.2_merged_BQSRecalibrated.bam"
-ALLNAMES="B00JAKE B00JAKC B00JAKD"
-NAMES="B00JAKC B00JAKD"
+XDIR=$7
+
+NORMAL_ID=$8
+TUMOR_ID="$9 ${10} ${11}"
+
+NORMAL="${XDIR}/$(ls *${NORMAL_ID}*bam)"
+
+BAMS=""
+for t in ${TUMOR_ID}
+do
+   tumor="$(ls ${XDIR}/*$t*bam)"
+   BAMS="${BAMS} ${tumor}"
+done
+
+ALLNAMES="${NORMAL_ID} ${TUMOR_ID}"
+NAMES="${TUMOR_ID}"
 J=32 # number of cpu used to run hatchet
 
 set -e
