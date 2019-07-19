@@ -23,6 +23,7 @@ params.mem = 4
 params.samtools_folder = "/usr/bin/"
 params.bcftools_folder = "/usr/bin/"
 params.bnpy_folder = "/usr/bin/"
+params.hatchet_folder = "/usr/bin/"
 params.input_folder = null
 params.ref = null
 params.output_folder = "."
@@ -91,7 +92,8 @@ process hatchet {
      shell :
      sampleID=normalBam.baseName.replace("bam","")
      '''
-     echo !{baseDir}/bin/run_HATCHet.sh !{params.cpu} !{params.ref} !{params.samtools_folder} \
+      !{baseDir}/bin/run_HATCHet.sh !{params.cpu} !{params.ref} !{params.samtools_folder} \
       !{params.bcftools_folder} !{params.bnpy_folder} !{params.hatchet_folder} !{params.input_folder} \
+      !{normalBam} !{tumor1Bam} !{tumor2Bam}
      '''
 }

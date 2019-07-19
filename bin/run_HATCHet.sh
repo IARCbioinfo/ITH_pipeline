@@ -36,19 +36,19 @@ PS4='\''[\t]'\'
 export PATH=$PATH:${SAM}
 export PATH=$PATH:${BCF}
 
-BIN=${XDIR}bin/
+BIN=${XDIR}/bin/
 mkdir -p ${BIN}
-BAF=${XDIR}baf/
+BAF=${XDIR}/baf/
 mkdir -p ${BAF}
-BB=${XDIR}bb/
+BB=${XDIR}/bb/
 mkdir -p ${BB}
-BBC=${XDIR}bbc/
+BBC=${XDIR}/bbc/
 mkdir -p ${BBC}
-ANA=${XDIR}analysis/
+ANA=${XDIR}/analysis/
 mkdir -p ${ANA}
-RES=${XDIR}results/
+RES=${XDIR}/results/
 mkdir -p ${RES}
-EVA=${XDIR}evaluation/
+EVA=${XDIR}/evaluation/
 mkdir -p ${EVA}
 
 cd ${XDIR}
