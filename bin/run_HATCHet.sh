@@ -16,7 +16,7 @@ TUMOR_FILE="$9 ${10} ${11}"
 NORMAL="${NORMAL_FILE}"
 
 # here XDIR is the working directory, path can be uncomplete because we dont do 'cd XDIR' line 50
-XDIR="$7${NORMAL_FILE//.bam/}"
+XDIR="$7_${NORMAL_FILE//.bam/}"
 
 BAMS="${TUMOR_FILE}"
 
