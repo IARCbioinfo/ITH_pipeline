@@ -44,7 +44,8 @@ ENV BNPYOUTDIR=~/nbpy-dev-results
 RUN cd ~ && wget https://packages.gurobi.com/8.1/gurobi8.1.1_linux64.tar.gz && tar -zxvf gurobi8.1.1_linux64.tar.gz
 RUN cd ~/gurobi811/linux64/src/build/ && make && cp libgurobi_c++.a ../../lib/
 ENV PATH=${PATH}:~/gurobi811/linux64/bin
-ENV GRB_LICENSE_FILE=~/gurobi811/gurobi.lic # here should be modified to get the license path in input
+# next should be modified to get the license path in input
+ENV GRB_LICENSE_FILE=~/gurobi811/gurobi.lic
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:~/gurobi811/linux64/lib"
 ENV GUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so
 
