@@ -46,8 +46,6 @@ mkdir -p ${RES}
 EVA=${XDIR}/evaluation/
 mkdir -p ${EVA}
 
-cd ${XDIR}
-
 # run binBAM
 python2 ${UTILS}binBAM.py -N ${NORMAL} -T ${BAMS} -S ${ALLNAMES} \
                                    -b 50kb -g hg38 -j ${J} \
