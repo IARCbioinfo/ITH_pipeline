@@ -73,9 +73,9 @@ assert (params.correspondance != null) : "please provide the --correspondance op
 
 correspondance = file(params.correspondance)
 bams = Channel.fromPath(correspondance).splitCsv(header: true, sep: '\t', strip: true)
-                .map{row -> [ file(params.input_folder + "/" +row.normal), file(params.input_folder + "/" +row.normal+'*.bai'),
-                              file(params.input_folder + "/" +row.tumor1), file(params.input_folder + "/" +row.tumor1+'*.bai'),
-                              file(params.input_folder + "/" +row.tumor2), file(params.input_folder + "/" +row.tumor2+'*.bai')]}
+                .map{row -> [ file(params.input_folder + "/" +row.normal), file(params.input_folder + "/" +row.normal+'.bai'),
+                              file(params.input_folder + "/" +row.tumor1), file(params.input_folder + "/" +row.tumor1+'.bai'),
+                              file(params.input_folder + "/" +row.tumor2), file(params.input_folder + "/" +row.tumor2+'.bai')]}
 
 process hatchet {
 		 cpus params.cpu
