@@ -10,6 +10,7 @@ HATCHET="${HATCHET_HOME}/bin/HATCHet.py"
 UTILS="${HATCHET_HOME}/utils/"
 SOLVER="${HATCHET_HOME}/build/solve"
 
+# here XDIR is the working directory, path can be uncomplete because we dont do 'cd XDIR' line 50
 XDIR=$7
 
 NORMAL_FILE=$8
