@@ -15,14 +15,9 @@ XDIR=$7
 NORMAL_FILE=$8
 TUMOR_FILE="$9 ${10} ${11}"
 
-NORMAL="${XDIR}/${NORMAL_FILE}"
+NORMAL="${NORMAL_FILE}"
 
-BAMS=""
-for t in ${TUMOR_FILE}
-do
-   tumor="$(ls ${XDIR}/$t)"
-   BAMS="${BAMS} ${tumor}"
-done
+BAMS="${TUMOR_FILE}"
 
 ALLNAMES="${NORMAL_FILE} ${TUMOR_FILE}"
 ALLNAMES="${ALLNAMES//.bam/}"
