@@ -12,21 +12,23 @@ SOLVER="${HATCHET_HOME}/build/solve"
 
 XDIR=$7
 
-NORMAL_ID=$8
-TUMOR_ID="$9 ${10} ${11}"
+NORMAL_FILE=$8
+TUMOR_FILE="$9 ${10} ${11}"
 
-NORMAL="${XDIR}/$(ls *${NORMAL_ID}*bam)"
+NORMAL="${XDIR}/${NORMAL_FILE}"
 
 BAMS=""
-for t in ${TUMOR_ID}
+for t in ${TUMOR_FILE}
 do
-   tumor="$(ls ${XDIR}/*$t*bam)"
+   tumor="$(ls ${XDIR}/$t)"
    BAMS="${BAMS} ${tumor}"
 done
 
-ALLNAMES="${NORMAL_ID} ${TUMOR_ID}"
-NAMES="${TUMOR_ID}"
-J=32 # number of cpu used to run hatchet
+ALLNAMES="${NORMAL_FILE} ${TUMOR_FILE}"
+ALLNAMES="${ALLNAMES//.bam/}"
+NAMES="${TUMOR_FILE}"
+NAMES="${NAMES//.bam/}"
+J=$1 # number of cpu used to run hatchet
 
 set -e
 set -o xtrace

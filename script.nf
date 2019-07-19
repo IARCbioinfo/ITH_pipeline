@@ -48,6 +48,7 @@ if (params.help) {
     log.info "Mandatory arguments:"
     log.info "--input_folder         PATH        Folder containing bam files"
     log.info "--ref                  PATH        WHOLE Path to reference fasta file (should be indexed)"
+    log.info "--correspondance       FILE        File containing correspondence between path to normal and path to tumor bams for each patient  "
     log.info ""
     log.info "Optional arguments:"
     log.info "--cpu                  INTEGER     Number of cpu to use (default=1)"
@@ -67,9 +68,13 @@ if (params.help) {
 
 assert (params.input_folder != null) : "please provide the --input_folder option"
 assert (params.ref != null) : "please provide the --ref option"
+assert (params.correspondance != null) : "please provide the --correspondance option"
 
-bams = Channel.fromPath( params.input_folder+'/*.bam')
-              .ifEmpty { error "Cannot find any BAM file in: ${params.input_folder}" }
+correspondance = file(params.correspondance)
+bams = Channel.fromPath(correspondance).splitCsv(header: true, sep: '\t', strip: true)
+                .map{row -> [ file(params.input_folder + "/" +row.normal), file(params.input_folder + "/" +row.normal+'*.bai'),
+                              file(params.input_folder + "/" +row.tumor1), file(params.input_folder + "/" +row.tumor1+'*.bai'),
+                              file(params.input_folder + "/" +row.tumor2), file(params.input_folder + "/" +row.tumor2+'*.bai')]}
 
 process hatchet {
 		 cpus params.cpu
@@ -79,15 +84,14 @@ process hatchet {
      publishDir params.output_folder, mode: 'copy'
 
      input :
-     file bam from bams
+     set file(normalBam), file(normalBai), file(tumor1Bam), file(tumor1Bai), file(tumor2Bam), file(tumor2Bai) from bams
 
      output:
-     file "${sampleID}*.vcf" into vcf
-     file "${sampleID}.alignments.txt.gz" into alignments
 
      shell :
-     sampleID=bam.baseName.replace("bam","")
+     sampleID=normalBam.baseName.replace("bam","")
      '''
-     !{baseDir}/bin/run_HATCHet.sh ${params.cpu} !{params.ref} !{params.samtools_folder} !{params.bcftools_folder} !{params.bnpy_folder} !{params.hatchet_folder} !{params.input_folder}
+     echo !{baseDir}/bin/run_HATCHet.sh !{params.cpu} !{params.ref} !{params.samtools_folder} \
+      !{params.bcftools_folder} !{params.bnpy_folder} !{params.hatchet_folder} !{params.input_folder} \
      '''
 }
