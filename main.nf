@@ -92,7 +92,7 @@ process hatchet {
      output:
 
      shell :
-     sampleID=normalBam.baseName.replace("bam","")
+     sampleID=bamN.baseName.replace("bam","")
      '''
       !{baseDir}/bin/run_HATCHet.sh !{params.cpu} !{params.ref} !{params.samtools_folder} \
       !{params.bcftools_folder} !{params.bnpy_folder} !{params.hatchet_folder} !{params.output_folder} \
