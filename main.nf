@@ -86,7 +86,7 @@ process hatchet {
 
      publishDir params.output_folder, mode: 'copy'
 
-     input :
+     input:
      set val(sample), file(bamT), file(baiT), file(bamN), file(baiN) from tn_bambai
 
      output:
