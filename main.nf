@@ -24,7 +24,7 @@ params.samtools_folder = "/usr/bin/"
 params.bcftools_folder = "/usr/bin/"
 params.bnpy_folder = "/usr/bin/"
 params.hatchet_folder = "/usr/bin/"
-params.input_folder = null
+params.bam_folder = null
 params.ref = null
 params.output_folder = "results"
 
