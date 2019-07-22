@@ -67,7 +67,7 @@ if (params.help) {
     exit 0
 }
 
-assert (params.bam_folder != null) : "please provide the --input_folder option"
+assert (params.bam_folder != null) : "please provide the --bam_folder option"
 assert (params.ref != null) : "please provide the --ref option"
 assert (params.correspondance != null) : "please provide the --correspondance option"
 
