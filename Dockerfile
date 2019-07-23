@@ -57,6 +57,7 @@ RUN mkdir ~/hatchet/build && cd ~/hatchet/build/ && cmake .. \
         -DGUROBI_CPP_LIB=/root/gurobi811/linux64/lib/libgurobi_c++.a \
         -DGUROBI_INCLUDE_DIR=/root/gurobi811/linux64/include/ \
         -DGUROBI_LIB=/root/gurobi811/linux64/lib/libgurobi81.so && make
+RUN sed -i '451,452s/.*/#&/' ~/hatchet/utils/ArgParsing.py # see issue: https://github.com/raphael-group/hatchet/issues/1
 
 ################# DECIFER ##########################
 # install boost library
