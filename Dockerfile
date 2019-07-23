@@ -52,13 +52,11 @@ ENV GUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so
 # install hatchet
 # here should 1. modify FindGUROBI.cmake to add gurobi path 2. modify CMakeLists.txt by adding -pthread
 RUN cd ~ && git clone https://github.com/raphael-group/hatchet
-RUN cd hatchet && sed -i '5s/""/"~\/gurobi811\/"/g' FindGUROBI.cmake && sed -i '7s/-std=c++11/-std=c++11 -pthread/g' CMakeLists.txt # second sed only in this dockerfile
-RUN mkdir build && cd build/
-RUN cmake .. \
+RUN cd ~/hatchet && sed -i '5s/""/"~\/gurobi811\/"/g' FindGUROBI.cmake && sed -i '7s/-std=c++11/-std=c++11 -pthread/g' CMakeLists.txt # second sed only in this dockerfile
+RUN mkdir ~/hatchet/build && cd ~/hatchet/build/ && cmake .. \
         -DGUROBI_CPP_LIB=/root/gurobi811/linux64/lib/libgurobi_c++.a \
         -DGUROBI_INCLUDE_DIR=/root/gurobi811/linux64/include/ \
-        -DGUROBI_LIB=/root/gurobi811/linux64/lib/libgurobi81.so
-RUN make
+        -DGUROBI_LIB=/root/gurobi811/linux64/lib/libgurobi81.so && make
 
 ################# DECIFER ##########################
 # install boost library
