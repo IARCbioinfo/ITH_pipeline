@@ -63,7 +63,7 @@ python2 ${UTILS}comBBo.py -c ${BIN}normal.bin -C ${BIN}bulk.bin -B ${BAF}bulk.ba
 
 # run cluBB
 python2 ${UTILS}cluBB.py ${BB}bulk.bb -by ${BNPY} -o ${BBC}bulk.seg -O ${BBC}bulk.bbc \
-                                              -e 12 -tB 0.04 -tR 0.15 -d 0.08
+                                              -e 12 -tB 0.03 -tR 0.15 -d 0.08
 
 cd ${ANA}
 python2 ${UTILS}BBot.py -c RD --figsize 6,3 ${BBC}bulk.bbc &
