@@ -1,12 +1,12 @@
 # ITH_pipeline
 ## Nextflow pipeline to study intra-tumoral heterogeneity
 
-[comment]: <> [![CircleCI](https://circleci.com/gh/IARCbioinfo/template-nf.svg?style=svg)](https://circleci.com/gh/IARCbioinfo/template-nf)
-[comment]: <> [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/iarcbioinfo/template-nf/)
-[comment]: <> [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1404)
-[comment]: <> [![DOI](https://zenodo.org/badge/94193130.svg)](https://zenodo.org/badge/latestdoi/94193130)
+[//]: # [![CircleCI](https://circleci.com/gh/IARCbioinfo/template-nf.svg?style=svg)](https://circleci.com/gh/IARCbioinfo/template-nf)
+[//]: # [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/iarcbioinfo/template-nf/)
+[//]: # [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1404)
+[//]: # [![DOI](https://zenodo.org/badge/94193130.svg)](https://zenodo.org/badge/latestdoi/94193130)
 
-[comment]: <> ![Workflow representation](template-nf.png)
+[//]: # ![Workflow representation](template-nf.png)
 
 ## Description
 Nextflow pipeline to study intra-tumoral heterogeneity through subclonality reconstruction, using HATCHet, DeCiFer and clonEvol.
@@ -72,7 +72,7 @@ Flags are special parameters without value.
 ...
 
 ## Directed Acyclic Graph
-[comment]: <> [![DAG](dag.png)](http://htmlpreview.github.io/?https://github.com/IARCbioinfo/template-nf/blob/master/dag.html)
+[//]: # [![DAG](dag.png)](http://htmlpreview.github.io/?https://github.com/IARCbioinfo/template-nf/blob/master/dag.html)
 
 ## Contributions
 
