@@ -1,5 +1,5 @@
-# Name
-## Empty template for nextflow pipelines (short description)
+# ITH_pipeline
+## Nextflow pipeline to study intra-tumoral heterogeneity
 
 [comment]: <> [![CircleCI](https://circleci.com/gh/IARCbioinfo/template-nf.svg?style=svg)](https://circleci.com/gh/IARCbioinfo/template-nf)
 [comment]: <> [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/iarcbioinfo/template-nf/)
