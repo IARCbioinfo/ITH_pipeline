@@ -16,7 +16,7 @@ TUMOR_FILE="$9 ${10} ${11}"
 NORMAL="${NORMAL_FILE}"
 
 # here XDIR is the working directory, path can be uncomplete because we dont do 'cd XDIR' line 50
-XDIR="$7_${NORMAL_FILE//.bam/}"
+XDIR="results_${NORMAL_FILE//.bam/}"
 
 BAMS="${TUMOR_FILE}"
 
@@ -73,7 +73,7 @@ python2 ${UTILS}BBot.py -c BB ${BBC}bulk.bbc &
 python2 ${UTILS}BBot.py -c CBB ${BBC}bulk.bbc &
 wait
 
-cd ${RES}
+cd ../.. && cd ${RES}
 python2 ${HATCHET} ${SOLVER} -i ${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 - j ${J} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > hatchet.log))
 
 ## Increase -l to 0.6 to decrease the sensitivity in high-variance or noisy samples, and decrease it to -l 0.3 in low-variance samples to increase the sensitivity and explore multiple solutions with more clones.
@@ -81,5 +81,5 @@ python2 ${HATCHET} ${SOLVER} -i ${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 - j ${
 ## Decrease the number of restarts to 200 or 100 for fast runs, as well as user can decrease the number of clones to -n 2,6 when appropriate or when previous runs suggest fewer clones.
 ## Increase the single-clone confidence to `-c 0.6` to increase the confidence in the presence of a single tumor clone and further increase this value when interested in a single clone.
 
-cd ${EVA}
+cd ../.. && cd ${EVA}
 python ${UTILS}BBeval.py ${RES}/best.bbc.ucn
