@@ -69,13 +69,13 @@ RUN sed -i '451,452s/.*/#&/' ~/hatchet/utils/ArgParsing.py # see issue: https://
 # install lemon
 #RUN cd ~ && wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
 #RUN tar -zxvf lemon-1.3.1.tar.gz
-#RUN cd lemon-1.3.1/ && mkdir build && cd build && cmake .. && make
+#RUN cd lemon-1.3.1/ && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=~/lemon .. && make && make install
 
 #install decifer
 #RUN cd ~ && git clone https://github.com/raphael-group/decifer && cd decifer
 #RUN mkdir build && cd build
 
-#RUN cmake -DLIBLEMON_ROOT=~/lemon-1.3.1/lemon -DCPLEX=OFF \
+#RUN cmake -DLIBLEMON_ROOT=~/lemon -DCPLEX=OFF \
 #-DGUROBI_INCLUDE_DIR=~/gurobi811/linux64/include \
 #-DGUROBI_CPP_LIB=~/gurobi811/linux64/lib/libgurobi_c++.a \
 #-DGUROBI_LIB=~/gurobi811/linux64/lib/libgurobi81.so ..
