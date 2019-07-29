@@ -10,7 +10,7 @@ args <- argsL;rm(argsL)
 
 if(is.null(args$help)) {help=FALSE} else {help=TRUE}
 
-if(is.null(args$VCF) | is.null(args$CNV) | is.null(args$normal_id) | is.null(args$tumor1_id) | is.null(args$tumor2_id) | help) {
+if(is.null(args$VCF) | is.null(args$CNV) | is.null(args$normal_id) | is.null(args$tumors_id) | help) {
   cat("
 
       hatchetToDecifer.r: build a tsv file to input to decifer from one multisample VCF from mutect2 and one bbc.ucn file from hatchet 
