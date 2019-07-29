@@ -94,7 +94,8 @@ for(i in 1:nrow(reformated4decifer)){
       prop = CNV[id,paste("u_clone",clone,sep="")] * (1/(1-CNV[id,"u_normal"]))
       mat = as.numeric(unlist(strsplit(CNV[id,paste("cn_clone",clone,sep="")],"|"))[1])
       pat = as.numeric(unlist(strsplit(CNV[id,paste("cn_clone",clone,sep="")],"|"))[3])
-      dat = cbind(dat, mat, pat, prop)
+      if(mat>pat) dat = cbind(dat, mat, pat, prop)
+      if(mat<pat) dat = cbind(dat, pat, mat, prop)
     }
   }
   write.table(dat, file=output_file, append=T, quote = F, col.names = F, row.names = F, sep = "\t")
