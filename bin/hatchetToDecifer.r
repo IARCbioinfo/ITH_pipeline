@@ -52,7 +52,7 @@ while(dim(vcf_chunk)[1] != 0) {
   GT_matrix = geno(vcf_chunk,"GT")
   DP_matrix = geno(vcf_chunk,"DP")
   tumors_mutid = as.numeric(which( (GT_matrix[,normal_id]=="0/0" | GT_matrix[,normal_id]=="0|0") &
-                                                    DP_matrix[,tumor1_id]>min_dp & DP_matrix[,tumor2_id]>min_dp &
+                                     apply(DP_matrix[,tumors_id],1,function(x){min(x)})>min_dp &
                                      grepl("chr", rownames(vcf_chunk))))
   mutid=rownames(AD_matrix)
   # for the tumor 1 sample
