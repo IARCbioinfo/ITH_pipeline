@@ -74,7 +74,7 @@ python2 ${UTILS}BBot.py -c CBB ${BBC}bulk.bbc &
 wait
 
 cd ../.. && cd ${RES}
-python2 ${HATCHET} ${SOLVER} -i ${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 - j ${J} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > hatchet.log))
+python2 ${HATCHET} ${SOLVER} -i ${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j ${J} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > hatchet.log))
 
 ## Increase -l to 0.6 to decrease the sensitivity in high-variance or noisy samples, and decrease it to -l 0.3 in low-variance samples to increase the sensitivity and explore multiple solutions with more clones.
 ## Increase -u if solutions have clone proportions equal to the minimum threshold -u
