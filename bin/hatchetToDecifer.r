@@ -99,6 +99,3 @@ for(i in 1:nrow(reformated4decifer)){
   write.table(dat, file=output_file, append=T, quote = F, col.names = F, row.names = F)
 }
 
-cmd=paste("sed -i '1s/^/","teeeest","\n/' ",output_file,sep="")
-system(cmd)
-
