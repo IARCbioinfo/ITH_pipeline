@@ -66,15 +66,15 @@ python2 ${UTILS}cluBB.py ${BB}bulk.bb -by ${BNPY} -o ${BBC}bulk.seg -O ${BBC}bul
                                               -e 12 -tB 0.03 -tR 0.15 -d 0.08
 
 cd ${ANA}
-python2 ${UTILS}BBot.py -c RD --figsize 6,3 ${BBC}bulk.bbc &
-python2 ${UTILS}BBot.py -c CRD --figsize 6,3 ${BBC}bulk.bbc &
-python2 ${UTILS}BBot.py -c BAF --figsize 6,3 ${BBC}bulk.bbc &
-python2 ${UTILS}BBot.py -c BB ${BBC}bulk.bbc &
-python2 ${UTILS}BBot.py -c CBB ${BBC}bulk.bbc &
+python2 ${UTILS}BBot.py -c RD --figsize 6,3 ../../${BBC}bulk.bbc &
+python2 ${UTILS}BBot.py -c CRD --figsize 6,3 ../../${BBC}bulk.bbc &
+python2 ${UTILS}BBot.py -c BAF --figsize 6,3 ../../${BBC}bulk.bbc &
+python2 ${UTILS}BBot.py -c BB ../../${BBC}bulk.bbc &
+python2 ${UTILS}BBot.py -c CBB ../../${BBC}bulk.bbc &
 wait
 
 cd ../.. && cd ${RES}
-python2 ${HATCHET} ${SOLVER} -i ${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j ${J} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > hatchet.log))
+python2 ${HATCHET} ${SOLVER} -i ../../${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j ${J} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > hatchet.log))
 
 ## Increase -l to 0.6 to decrease the sensitivity in high-variance or noisy samples, and decrease it to -l 0.3 in low-variance samples to increase the sensitivity and explore multiple solutions with more clones.
 ## Increase -u if solutions have clone proportions equal to the minimum threshold -u
@@ -82,4 +82,4 @@ python2 ${HATCHET} ${SOLVER} -i ${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j ${J
 ## Increase the single-clone confidence to `-c 0.6` to increase the confidence in the presence of a single tumor clone and further increase this value when interested in a single clone.
 
 cd ../.. && cd ${EVA}
-python ${UTILS}BBeval.py ${RES}/best.bbc.ucn
+python ${UTILS}BBeval.py ../../${RES}/best.bbc.ucn
