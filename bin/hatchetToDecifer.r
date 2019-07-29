@@ -70,7 +70,7 @@ while(dim(vcf_chunk)[1] != 0) {
   }
   vcf_chunk = readVcf(vcf, "hg19")
 }
-reformated4decifer$character_index = match(reformated4decifer$character_label, unique(reformated4decifer$character_label))
+reformated4decifer$character_index = match(reformated4decifer$character_label, unique(reformated4decifer$character_label)) - 1
 reformated4decifer = reformated4decifer[c("sample_index","sample_label","character_index","character_label","ref","var")]
 x = colnames(CNV)[length(colnames(CNV))] ; n_clone_hatchet = as.numeric(substr(x,nchar(x),nchar(x)))
 
