@@ -90,6 +90,7 @@ process hatchet {
      set val(sample), file(bamT), file(baiT), file(bamN), file(baiN) from tn_bambai
 
      output:
+     file 'results*' into output
 
      shell :
      sampleID=bamN.baseName.replace("bam","")
