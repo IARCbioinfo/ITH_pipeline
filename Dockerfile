@@ -61,8 +61,7 @@ RUN sed -i '451,452s/.*/#&/' ~/hatchet/utils/ArgParsing.py # see issue: https://
 
 ################# DECIFER ##########################
 # install boost library
-RUN cd ~ && wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2
-RUN tar --bzip2 -xf ~/boost_1_61_0.tar.bz2
+RUN cd ~ && wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2 && tar --bzip2 -xf boost_1_61_0.tar.bz2
 RUN cd ~/boost_1_61_0 && ./bootstrap.sh --prefix=~/usr && ./b2
 ENV BOOST_ROOT=~/boost_1_61_0
 
