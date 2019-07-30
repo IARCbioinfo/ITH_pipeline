@@ -74,8 +74,8 @@ reformated4decifer$character_index = match(reformated4decifer$character_label, u
 reformated4decifer = reformated4decifer[c("sample_index","sample_label","character_index","character_label","ref","var")]
 x = colnames(CNV)[length(colnames(CNV))] ; n_clone_hatchet = as.numeric(substr(x,nchar(x),nchar(x)))
 
-write.table(paste(length(tumors_id)," #samples",sep=""), file=output_file, append=T, quote = F, col.names = F, row.names = F, sep = "\t")
-write.table(paste(length(unique(reformated4decifer$character_label))," #characters",sep=""), file=output_file, append=T,
+write.table("#samples ",paste(length(tumors_id),sep=""), file=output_file, append=T, quote = F, col.names = F, row.names = F, sep = "\t")
+write.table("#characters ", paste(length(unique(reformated4decifer$character_label)),sep=""), file=output_file, append=T,
             quote = F, col.names = F, row.names = F, sep = "\t")
 write.table("#sample_index\tsample_label\tcharacter_index\tcharacter_label\tref\tvar", 
             file=output_file, append=T, quote = F, col.names = F, row.names = F, sep = "\t")
