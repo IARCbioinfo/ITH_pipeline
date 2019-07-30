@@ -61,18 +61,16 @@ RUN sed -i '451,452s/.*/#&/' ~/hatchet/utils/ArgParsing.py # see issue: https://
 
 ################# DECIFER ##########################
 # install boost library
-RUN cd ~ && wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2
-RUN tar --bzip2 -xf ~/boost_1_61_0.tar.bz2
+RUN cd ~ && wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2 && tar --bzip2 -xf boost_1_61_0.tar.bz2
 RUN cd ~/boost_1_61_0 && ./bootstrap.sh --prefix=~/usr && ./b2
 ENV BOOST_ROOT=~/boost_1_61_0
 
 # install lemon
-RUN cd ~ && wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
-RUN tar -zxvf ~/lemon-1.3.1.tar.gz
+RUN cd ~ && wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz && tar -zxvf lemon-1.3.1.tar.gz
 RUN cd ~/lemon-1.3.1/ && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=~/lemon .. && make && make install
 
 #install decifer
-RUN cd ~ && git clone https://github.com/raphael-group/decifer && cd decifer
+RUN cd ~ && git clone https://github.com/raphael-group/decifer
 RUN cd ~/decifer/ && mkdir build && cd build && cmake -DLIBLEMON_ROOT=~/lemon -DCPLEX=OFF \
 -DGUROBI_INCLUDE_DIR=~/gurobi811/linux64/include \
 -DGUROBI_CPP_LIB=~/gurobi811/linux64/lib/libgurobi_c++.a \
