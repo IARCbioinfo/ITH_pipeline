@@ -81,5 +81,6 @@ python2 ${HATCHET} ${SOLVER} -i ../../${BBC}bulk -n2,6 -p 100 -v 2 -u 0.1 -r 12 
 ## Decrease the number of restarts to 200 or 100 for fast runs, as well as user can decrease the number of clones to -n 2,6 when appropriate or when previous runs suggest fewer clones.
 ## Increase the single-clone confidence to `-c 0.6` to increase the confidence in the presence of a single tumor clone and further increase this value when interested in a single clone.
 
-cd ../.. && cd ${EVA}
-python ${UTILS}BBeval.py ../../${RES}/best.bbc.ucn
+## To compute the plots, run the following lines
+## cd ../.. && cd ${EVA}
+## python ${UTILS}BBeval.py ../../${RES}/best.bbc.ucn
