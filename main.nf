@@ -28,6 +28,8 @@ params.bam_folder = null
 params.ref = null
 params.output_folder = "results"
 
+params.cluBB_d = 0.08
+
 log.info ""
 log.info "----------------------------------------------------------------"
 log.info "            Intratumoral heterogeneity with HATCHet             "
@@ -79,24 +81,151 @@ bams = Channel.fromPath(correspondance).splitCsv(header: true, sep: '\t', strip:
 tn_bambai = bams.groupTuple(by: 0)
                   .map { row -> tuple(row[0] , row[1], row[2] , row[3][0] , row[4][0]  ) }
 
-process hatchet {
-		 cpus params.cpu
+
+tn_bambai.into{ tn_bambai_4binBAM ; tn_bambai_4bafBAM }
+
+process binBAM {
+     cpus params.cpu
      memory params.mem+'G'
      tag { sampleID }
 
-     publishDir params.output_folder, mode: 'copy'
+     publishDir params.output_folder+"/bin/", mode: 'copy'
 
      input:
-     set val(sample), file(bamT), file(baiT), file(bamN), file(baiN) from tn_bambai
+     set val(sampleID), file(bamT), file(baiT), file(bamN), file(baiN) from tn_bambai_4binBAM
 
      output:
-     file 'results*' into output
+     set val(sample), file('*_normal.bin'), file('*_bulk.bin') into bins
+     file('*.log') into bin_logs
 
      shell :
-     sampleID=bamN.baseName.replace("bam","")
      '''
-      !{baseDir}/bin/run_HATCHet.sh !{params.cpu} !{params.ref} !{params.samtools_folder} \
-      !{params.bcftools_folder} !{params.bnpy_folder} !{params.hatchet_folder} !{params.output_folder} \
-      !{bamN} !{bamT}
+     ALLNAMES="!{bamN} !{bamT}"
+     ALLNAMES="${ALLNAMES//.bam/}"
+     python2 !{params.hatchet_folder}/utils/binBAM.py -N !{bamN} -T !{bamT} -S ${ALLNAMES} -b 50kb -g hg38 -j !{params.cpu} -q 20 -O !{sampleID}_normal.bin -o !{sampleID}_bulk.bin -v &> !{sampleID}_bins.log
+     '''
+}
+
+process deBAF {
+     cpus params.cpu
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/baf/", mode: 'copy'
+
+     input:
+     set val(sampleID), file(bamT), file(baiT), file(bamN), file(baiN) from tn_bambai_4bafBAM
+
+     output:
+     set val(sampleID), file('*_normal.baf'), file('*_bulk.baf') into bafs
+     file('*.log') into baf_logs
+
+     shell :
+     '''
+     ALLNAMES="!{bamN} !{bamT}"
+     ALLNAMES="${ALLNAMES//.bam/}"
+     python2 !{params.hatchet_folder}/utils/deBAF.py -N !{bamN} -T !{bamT} -S ${ALLNAMES} -r !{params.ref} -j !{params.cpu} -q 20 -Q 20 -U 20 -c 4 -C 300 -O !{sampleID}_normal.baf -o !{sampleID}_bulk.baf -v &> !{sampleID}_bafs.log
+     '''
+}
+binbafs = bins.join(bafs)
+
+process comBBo {
+     cpus params.cpu
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/bb/", mode: 'copy'
+
+     input:
+     set val(sampleID), file(bin_normal), file(bin_bulk), file(baf_normal), file(baf_bulk) from binbafs
+
+     output:
+     set val(sampleID), file('*.bb') into bbs
+
+     shell :
+     '''
+     python2 !{params.hatchet_folder}/utils/comBBo.py -c !{bin_normal} -C !{bin_bulk} -B !{baf_bulk} -m MIRROR -e 12 > !{sampleID}_bulk.bb
+     '''
+}
+
+process cluBB {
+     cpus params.cpu
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/bbc/", mode: 'copy'
+
+     input:
+     set val(sampleID), file(bb) from bbs
+
+     output:
+     set val(sampleID), file('*.seg'), file('*.bbc') into bbcs
+
+     shell :
+     '''
+     python2 !{params.hatchet_folder}/utils/cluBB.py !{bb} -by !{params.bnpy_folder} -o !{sampleID}_bulk.seg -O !{sampleID}_bulk.bbc -e 12 -tB 0.03 -tR 0.15 -d !{params.cluBB_d}
+     '''
+}
+bbcs.into{bbcs4plots; bbcs4hatchet }
+
+process plots {
+     cpus params.cpu
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/plots/", mode: 'copy'
+
+     input:
+     set val(sampleID), file(seg), file(bbc) from bbcs4plots
+
+     output:
+     file('*.pdf') into plots
+
+     shell :
+     '''
+     python2 !{params.hatchet_folder}/utils/BBot.py -c RD  --figsize 6,3 !{bbc} &
+     python2 !{params.hatchet_folder}/utils/BBot.py -c CRD --figsize 6,3 !{bbc} &
+     python2 !{params.hatchet_folder}/utils/BBot.py -c BAF --figsize 6,3 !{bbc} &
+     python2 !{params.hatchet_folder}/utils/BBot.py -c BB  !{bbc} &
+     python2 !{params.hatchet_folder}/utils/BBot.py -c CBB !{bbc} &
+     '''
+}
+
+process hatchet {
+     cpus params.cpu
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/results/", mode: 'copy'
+
+     input:
+     set val(sampleID), file(seg), file(bbc) from bbcs4hatchet
+
+     output:
+     file '*ucn*' into ucns
+     file '*.log' into logs_hatchet
+
+     shell :
+     '''
+     python2 !{params.hatchet_folder}/bin/HATCHet.py !{params.hatchet_folder}/build/solve -i !{bbc} -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j !{params.cpu} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > !{sampleID}_hatchet.log))
+     '''
+}
+
+process plot_final {
+     cpus params.cpu
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/plots/", mode: 'copy'
+
+     input:
+     file(ucns)
+
+     output:
+     file('*.pdf')
+
+     shell :
+     '''
+     python2 {params.hatchet_folder}/utils/BBeval.py !{sampleID}_best.bbc.ucn
      '''
 }
