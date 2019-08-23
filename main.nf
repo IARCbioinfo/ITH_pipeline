@@ -95,14 +95,15 @@ process binBAM {
      set val(sampleID), file(bamT), file(baiT), file(bamN), file(baiN) from tn_bambai_4binBAM
 
      output:
-     set val(sample), file('*_normal.bin'), file('*_bulk.bin') into bins
+     set val(sampleID), file('*_normal.bin'), file('*_bulk.bin') into bins
      file('*.log') into bin_logs
+     file('*total.bin')
 
      shell :
      '''
      ALLNAMES="!{bamN} !{bamT}"
      ALLNAMES="${ALLNAMES//.bam/}"
-     python2 !{params.hatchet_folder}/utils/binBAM.py -N !{bamN} -T !{bamT} -S ${ALLNAMES} -b 50kb -g hg38 -j !{params.cpu} -q 20 -O !{sampleID}_normal.bin -o !{sampleID}_bulk.bin -v &> !{sampleID}_bins.log
+     python2 !{params.hatchet_folder}/utils/binBAM.py -N !{bamN} -T !{bamT} -S ${ALLNAMES} -b 50kb -g hg38 -j !{params.cpu} -q 20 -O !{sampleID}_normal.bin -o !{sampleID}_bulk.bin -t !{sampleID}_total.bin -v &> !{sampleID}_bins.log
      '''
 }
 
@@ -188,6 +189,8 @@ process plots {
      python2 !{params.hatchet_folder}/utils/BBot.py -c BAF --figsize 6,3 !{bbc} &
      python2 !{params.hatchet_folder}/utils/BBot.py -c BB  !{bbc} &
      python2 !{params.hatchet_folder}/utils/BBot.py -c CBB !{bbc} &
+     wait
+     for f in *.pdf ; do mv -- "$f" "!{sampleID}_$f" ; done
      '''
 }
 
@@ -202,12 +205,14 @@ process hatchet {
      set val(sampleID), file(seg), file(bbc) from bbcs4hatchet
 
      output:
-     file '*ucn*' into ucns
+     set val(sampleID), file('*ucn*') into ucns
      file '*.log' into logs_hatchet
 
      shell :
+     prefix = bbc.baseName
      '''
-     python2 !{params.hatchet_folder}/bin/HATCHet.py !{params.hatchet_folder}/build/solve -i !{bbc} -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j !{params.cpu} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > !{sampleID}_hatchet.log))
+     python2 !{params.hatchet_folder}/bin/HATCHet.py !{params.hatchet_folder}/build/solve -i !{prefix} -n2,6 -p 100 -v 2 -u 0.1 -r 12 -j !{params.cpu} -eD 6 -eT 12 -l 0.5 &> >(tee >(grep -v Progress > !{sampleID}_hatchet.log))
+     for f in *ucn* ; do mv -- "$f" "!{sampleID}_$f" ; done
      '''
 }
 
@@ -219,13 +224,14 @@ process plot_final {
      publishDir params.output_folder+"/plots/", mode: 'copy'
 
      input:
-     file(ucns)
+     set val(sampleID), file(ucn) from ucns
 
      output:
      file('*.pdf')
 
      shell :
      '''
-     python2 {params.hatchet_folder}/utils/BBeval.py !{sampleID}_best.bbc.ucn
+     python2 !{params.hatchet_folder}/utils/BBeval.py !{sampleID}_best.bbc.ucn
+     for f in *.pdf ; do mv -- "$f" "!{sampleID}_$f" ; done
      '''
 }
