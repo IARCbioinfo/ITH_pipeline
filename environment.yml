@@ -1,0 +1,7 @@
+name: hatchet
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - hatchet=0.2.11
