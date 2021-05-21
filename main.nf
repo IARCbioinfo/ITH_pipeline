@@ -18,8 +18,9 @@
 
 params.help = null
 params.config	= null
-params.cpu  = 2
+params.cpu  = 22
 params.cpu2 = 2
+params.cpu3 = 8
 params.mem  = 8
 params.samtools_folder = "/usr/bin/"
 params.bcftools_folder = "/usr/bin/"
@@ -29,7 +30,11 @@ params.bam_folder = null
 params.ref = null
 params.output_folder = "results"
 params.bed = "NO_BED"
+params.cram = null
 params.known_snps = "https://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/GATK/00-All.vcf.gz"
+params.hmftools = null
+params.seg_gamma = 1000
+params.tumor_only = null
 
 
 params.cluBB_d  = 0.08
@@ -86,22 +91,119 @@ if (params.help) {
 assert (params.bam_folder != null) : "please provide the --bam_folder option"
 assert (params.ref != null) : "please provide the --ref option"
 assert (params.correspondance != null) : "please provide the --correspondance option"
+if(params.cram){
+     ext = ".crai"
+}else{
+     ext = ".bai"
+}
 
 correspondance = file(params.correspondance)
 bams = Channel.fromPath(correspondance).splitCsv(header: true, sep: '\t', strip: true)
-                  .map{ row -> [ row.sample , file(params.bam_folder + "/" + row.tumor), file(params.bam_folder + "/" + row.tumor+'.bai'),
-                                 file(params.bam_folder + "/" + row.normal), file(params.bam_folder + "/" + row.normal+'.bai') ] }
-
-tn_bambai = bams.groupTuple(by: 0)
-                  .map { row -> tuple(row[0] , row[1], row[2] , row[3][0] , row[4][0]  ) }
-
-
-tn_bambai.into{ tn_bambai_4binBAM ; tn_bambai_4bafBAM ; tn_bambai_4SNPcallingBAM}
+                  .map{ row -> [ row.sample , row.region, file(params.bam_folder + "/" + row.tumor), file(params.bam_folder + "/" + row.tumor+ext),
+                                 file(params.bam_folder + "/" + row.normal), file(params.bam_folder + "/" + row.normal+ext) ] }
 
 bed  = file(params.bed)
 ref  = file(params.ref)
 ref_fai  = file(params.ref+".fai")
 dict = file(params.ref.replaceFirst(/fasta/, "").replaceFirst(/fa/, "") +'dict')
+
+if(params.hmftools){
+     //tn_bambai = bams.groupTuple(by: 0)
+     //             .map { row -> tuple(row[0] , row[1], row[2] , row[3][0] , row[4][0]  ) }
+
+
+bams.into{ tn_bambai_4bin ; tn_bambai_4baf ; tn_bambai_4SNPcalling}
+
+process COBALT {
+ //from IARCbioinfo's PURPLE pipeline
+ cpus params.cpu
+ memory params.mem+'G'	
+ tag { tumor_id }
+
+  publishDir params.output_folder+'/COBALT/', mode: 'copy'
+  input:
+  set val(tumor_id), val(region), file(tumor), file(tumor_index), file(normal), file(normal_index) from tn_bambai_4bin
+  file(ref)
+  file(fai) from ref_fai
+
+  output:
+  set val(tumor_id), path("${tumor_id}_${region}_COBALT") into bins
+  script:
+     if(params.tumor_only){
+       """
+     COBALT  -Xms1g -Xmx${params.mem}g -gc_profile ${projectDir}/db/hg38/GC_profile.1000bp.38.cnp \\
+              -ref_genome ${ref} -tumor_only -tumor_only_diploid_bed /hmftools/hg38/DiploidRegions.38.bed \\
+     	        -tumor  ${tumor_id}_${region} -tumor_bam ${tumor} -output_dir ${tumor_id}_${region}_COBALT -threads ${params.cpu}
+       """
+     }else{
+       """
+     COBALT  -Xms1g -Xmx${params.mem}g -gc_profile ${projectDir}/db/hg38/GC_profile.1000bp.38.cnp \\
+              -ref_genome ${ref} -reference ${tumor_id}_N -reference_bam ${normal} \\
+     	        -tumor  ${tumor_id}_${region} -tumor_bam ${tumor} -output_dir ${tumor_id}_${region}_COBALT -threads ${params.cpu}
+      """
+     }
+}
+process AMBER {
+ cpus params.cpu
+ memory params.mem+'G'	
+ tag { tumor_id }
+
+  publishDir params.output_folder+'/AMBER/', mode: 'copy'
+  input:
+  set val(tumor_id), val(region), file(tumor), file(tumor_index), file(normal), file(normal_index) from tn_bambai_4baf
+  file(ref)
+  file(fai) from ref_fai
+  output:
+  set val(tumor_id), path("${tumor_id}_${region}_AMBER") into bafs
+  script:
+     if(params.tumor_only){
+       """
+      AMBER  -Xms1g -Xmx${params.mem}g  -loci ${projectDir}/db/hg38/GermlineHetPon.38.vcf -ref_genome ${ref} -tumor_only \\
+              -tumor  ${tumor_id}_${region} -tumor_bam ${tumor} -output_dir ${tumor_id}_${region}_AMBER -threads ${params.cpu}
+      """
+     }else{
+       """
+       AMBER   -Xms1g -Xmx${params.mem}g -loci ${projectDir}/db/hg38/GermlineHetPon.38.vcf -ref_genome ${ref} \\
+               -reference ${tumor_id}_N -reference_bam ${normal}  \\
+               -tumor  ${tumor_id}_${region} -tumor_bam ${tumor} -output_dir ${tumor_id}_${region}_AMBER -threads ${params.cpu}
+        """
+     }
+
+}
+//we merge previous results from amber and cobalt
+binbafs=bins.join(bafs, remainder: true)
+            .groupTuple(by: 0)
+            //.map { row -> tuple(row[0] , row[1], row[2] ) }
+
+process multisample_segmentation {
+     cpus params.cpu2
+     memory params.mem+'G'
+     tag { sampleID }
+
+     publishDir params.output_folder+"/bbseg/", mode: 'copy'
+
+     input:
+     set val(sampleID), file(baf_folders), file(ratio_folders) from binbafs
+
+     output:
+     set val(sampleID), file('*.bb') into bbs
+     file('*.pdf') into bbs_plots
+
+     shell :
+     '''
+     Rscript !{projectDir}/bin/hmftools2cluBB.r !{sampleID} "." "" !{params.seg_gamma} !{projectDir}/db/hg38/chrarms.tsv
+     '''
+}
+
+tR_list = [0.05,0.075,0.1,0.15,0.2,0.3]//(1..10)*0.1//params.cluBB_tR_min.step(params.cluBB_tR_max, 0.1 )
+tB_list = [ 0.001,0.002,0.005,0.01,0.05,0.1]//(1..10)*0.02//params.cluBB_tB_min.step(params.cluBB_tB_max, 0.05)
+
+}else{
+     tn_bambai = bams.groupTuple(by: 0)
+                  .map { row -> tuple(row[0] , row[2], row[3] , row[4][0] , row[4][0]  ) }
+
+
+tn_bambai.into{ tn_bambai_4binBAM ; tn_bambai_4bafBAM ; tn_bambai_4SNPcallingBAM}
 
 process binBAM {
      cpus params.cpu
@@ -122,7 +224,7 @@ process binBAM {
      file('*.log') into bin_logs
 
      shell :
-      if( bed.name=='NO_BED' ){
+     if( bed.name=='NO_BED' ){
         opt = ""
      }else{
         opt = "-r ${bed}"
@@ -211,9 +313,11 @@ process comBBo {
      python3 -m hatchet comBBo -c !{bin_normal} -C !{bin_tumor} -B !{baf_tumor} -t !{RDRtotal} > !{sampleID}_bulk.bb
      '''
 }
+tR_list = [0.025,0.05,0.075,0.1,0.15,0.2,0.3]
+tB_list = [0.02,0.04,0.06,0.1,0.15]
 
-tR_list = [0.1,0.15,0.2,0.3,0.4,0.5]//(1..10)*0.1//params.cluBB_tR_min.step(params.cluBB_tR_max, 0.1 )
-tB_list = [0.02,0.04,0.06,0.1,0.15]//(1..10)*0.02//params.cluBB_tB_min.step(params.cluBB_tB_max, 0.05)
+}
+
 
 process cluBB {
      cpus params.cpu2
@@ -231,16 +335,21 @@ process cluBB {
      set val(sampleID), file('*.seg'), file('*.bbc'), val(tB) , val(tR) into bbcs
 
      shell :
+     if( params.hmftools ){//trigger bootstrapping
+        opt = "-c 0.01 -K 40 -u 100 -dR 0.002 -dB 0.002"
+     }else{
+        opt = ""
+     }
      '''
-     python3 -m hatchet cluBB !{bb} -o !{sampleID}_tR!{tR}_tB!{tB}_tumor.seg -O !{sampleID}_tR!{tR}_tB!{tB}_tumor.bbc -tB !{tB} -tR !{tR} -d !{params.cluBB_d}
+     python3 -m hatchet cluBB !{bb} -o !{sampleID}_tR!{tR}_tB!{tB}_tumor.seg -O !{sampleID}_tR!{tR}_tB!{tB}_tumor.bbc !{opt} -tB !{tB} -tR !{tR} -d !{params.cluBB_d}
      '''
 }
 bbcs.into{bbcs4plots; bbcs4hatchet }
 
 process plots {
-     //cpus params.cpu2
-     //memory params.mem+'G'
-     //tag { sampleID }
+     cpus params.cpu2
+     memory params.mem+'G'
+     tag { sampleID }
      publishDir "${params.output_folder}/plots/${sampleID}", mode: 'copy'
 
      input:
@@ -256,7 +365,7 @@ process plots {
      python3 -m hatchet BBot -c BAF --figsize 6,3 !{bbc} &
      python3 -m hatchet BBot -c BB !{bbc} &
      python3 -m hatchet BBot -c CBB !{bbc} &
-
+     
      wait
      for f in *.pdf ; do mv -- $f "!{sampleID}_tB!{tB}_tR!{tR}_$f" ; done
      for f in *.png ; do mv -- $f "!{sampleID}_tB!{tB}_tR!{tR}_$f" ; done
@@ -264,23 +373,23 @@ process plots {
 }
 
 process hatchet {
-     cpus params.cpu
+     cpus params.cpu3
      memory params.mem+'G'
      tag { sampleID }
 
-     publishDir params.output_folder+"/results/", mode: 'copy'
+     publishDir "${params.output_folder}/results/", mode: 'copy'
 
      input:
      set val(sampleID), file(seg), file(bbc), val(tB) , val(tR) from bbcs4hatchet
 
      output:
-     set val(sampleID), file('*ucn*') into ucns
+     set val(sampleID), val(tB), val(tR), file('*/*ucn*'), file(bbc) into ucns
      file '*.log' into logs_hatchet
 
      shell :
      prefix = bbc.baseName
      '''
-     python3 -m hatchet solve -i !{prefix} -n2,10 -p 1000 -u 0.02 -j !{params.cpu} -eD 6 -eT 12 -g 0.35 \
+     python3 -m hatchet solve -i !{prefix} -n2,6 -p 1000 -u 0.02 -j !{params.cpu3} -eD 6 -eT 12 -g 0.35 \
                           -l 0.6 &> >(tee >(grep -v Progress > !{sampleID}_hatchet.log))
      mkdir !{sampleID}
      for f in *ucn* ; do mv -- $f "!{sampleID}/!{sampleID}_tB!{tB}_tR!{tR}_$f" ; done
@@ -292,18 +401,20 @@ process plot_final {
      memory params.mem+'G'
      tag { sampleID }
 
-     publishDir params.output_folder+"/plots/", mode: 'copy'
+     publishDir "${params.output_folder}/plots/", mode: 'copy'
 
      input:
-     set val(sampleID), file(ucn) from ucns
+     set val(sampleID), val(tB), val(tR), file(ucn), file(bbc) from ucns
 
      output:
-     file('*.pdf')
+     set file('*/*.pdf'), file("*/*.png") into plots_final
 
      shell :
+
      '''
-     python3 -m hatchet BBeval !{sampleID}_best.bbc.ucn -u 0.02
+     python3 -m hatchet BBeval !{ucn[0]} -u 0.02
      mkdir !{sampleID}
-     for f in *.pdf ; do mv -- $f "!{sampleID}/!{sampleID}_$f" ; done
+     for f in *.pdf ; do mv -- $f "!{sampleID}/!{sampleID}_tB!{tB}_tR!{tR}_$f" ; done
+     Rscript !{projectDir}/bin/plotClustering.r !{bbc} "!{sampleID}/"
      '''
 }
